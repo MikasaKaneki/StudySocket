@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using Share;
 
 namespace GameServer.Servers
 {
@@ -53,6 +54,20 @@ namespace GameServer.Servers
             }
 
             _server.RemoveClient(this);
+        }
+
+
+        public void Send(ActionCode actionCode, string data)
+        {
+            try
+            {
+                byte[] bytes = Message.PackData(actionCode, data);
+                _clientSocket.Send(bytes);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("客户端发送消息失败 error:" + e.Message);
+            }
         }
     }
 }

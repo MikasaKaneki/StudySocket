@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Xml.Serialization;
 using GameServer.Controller;
+using Share;
 
 namespace GameServer.Servers
 {
@@ -11,7 +13,7 @@ namespace GameServer.Servers
         private IPEndPoint _ipEndPoint;
         private Socket serverSocket;
         private List<Client> _clientList = new List<Client>();
-        private ControllerManager controllerManager = new ControllerManager();
+        private ControllerManager controllerManager;
 
         public Server()
         {
@@ -19,6 +21,7 @@ namespace GameServer.Servers
 
         public Server(string ipStr, int port)
         {
+            controllerManager = new ControllerManager(this);
             SetIpAndPort(ipStr, port);
         }
 
@@ -50,6 +53,11 @@ namespace GameServer.Servers
             {
                 _clientList.Remove(client);
             }
+        }
+
+        public void SendResponse(Client client, ActionCode actionCode, string data)
+        {
+            client.Send(actionCode, data);
         }
     }
 }
