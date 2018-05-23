@@ -37,13 +37,18 @@ namespace GameServer.Servers
                     Close();
                 }
 
-                msg.ReadMessage(count);
+                msg.ReadMessage(count, OnProcessMessage);
                 Start();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        private void OnProcessMessage(RequestCode requestCode, ActionCode actionCode, string data)
+        {
+            _server.HandleRequest(requestCode, actionCode, data, this);
         }
 
         private void Close()

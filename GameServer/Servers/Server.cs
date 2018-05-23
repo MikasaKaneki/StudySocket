@@ -57,7 +57,14 @@ namespace GameServer.Servers
 
         public void SendResponse(Client client, ActionCode actionCode, string data)
         {
+            //给客户端
             client.Send(actionCode, data);
+        }
+
+
+        public void HandleRequest(RequestCode requestCode, ActionCode actionCode, string data, Client client)
+        {
+            controllerManager.HandleRequest(requestCode, actionCode, data, client);
         }
     }
 }

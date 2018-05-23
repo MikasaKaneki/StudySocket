@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using Share;
 using GameServer.Servers;
@@ -33,6 +34,7 @@ namespace GameServer.Controller
                 Console.WriteLine("无法得到【" + requestCode + "】对应的controller，无法初期请求");
                 return;
             }
+
             string methodName = Enum.GetName(typeof(ActionCode), actionCode);
             MethodInfo methodInfo = controller.GetType().GetMethod(methodName);
             if (methodInfo == null)
@@ -40,11 +42,12 @@ namespace GameServer.Controller
                 Console.WriteLine("在Controller【" + controller.GetType() + "】中没有对应的处理方法+【" + methodName + "】");
                 return;
             }
+
             object[] parameters = new object[] {data, client, _server};
             object o = methodInfo.Invoke(controller, parameters);
-            if (string.IsNullOrEmpty((string) o))
+            if (!string.IsNullOrEmpty((string) o))
             {
-                
+                _server.SendResponse(client, actionCode, o as string);
             }
         }
     }

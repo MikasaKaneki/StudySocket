@@ -1,22 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 using Share;
 
-
 namespace GameServer.Servers
 {
-    public class Message
+    class Message
     {
         private byte[] data = new byte[1024];
         private int curDataSize = 0; //我们存取了多少字节的数据在数组里面
 
         private const int flagSize = 4;
-
-//        public void AddCount(int count)
-//        {
-//            curDataSize += count;
-//        }
 
         public byte[] Data
         {
@@ -38,7 +31,7 @@ namespace GameServer.Servers
         }
 
 
-        public string ReadMessage(int newDataAmount)
+        public string ReadMessage(int newDataAmount, Action<RequestCode, ActionCode, string> processDataCallback)
         {
             curDataSize += newDataAmount;
             string message = null;
@@ -54,7 +47,11 @@ namespace GameServer.Servers
                     int count = BitConverter.ToInt32(data, 0);
                     if (curDataSize - flagSize >= count)
                     {
-                        message = Encoding.UTF8.GetString(data, flagSize, count);
+                        RequestCode requestCode = (RequestCode) BitConverter.ToInt32(data, 4);
+                        ActionCode actionCode = (ActionCode) BitConverter.ToInt32(data, 8);
+
+                        message = Encoding.UTF8.GetString(data, flagSize + 8, count - 8);
+                        processDataCallback(requestCode, actionCode, message);
                         Array.Copy(data, count + flagSize, data, 0, curDataSize - flagSize - count);
                         curDataSize -= (count + flagSize);
                     }
@@ -75,8 +72,12 @@ namespace GameServer.Servers
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             int dataAmount = requestCodeBytes.Length + dataBytes.Length;
             byte[] dataAmountBytes = BitConverter.GetBytes(dataAmount);
-            byte[] newBytes = dataAmountBytes.Concat(requestCodeBytes).ToArray<byte>();
-            return newBytes.Concat(dataBytes).ToArray<byte>();
+
+            byte[] result = new byte[dataAmountBytes.Length + requestCodeBytes.Length + dataBytes.Length];
+            dataAmountBytes.CopyTo(result, 0);
+            requestCodeBytes.CopyTo(result, dataAmountBytes.Length);
+            dataBytes.CopyTo(result, dataAmountBytes.Length + requestCodeBytes.Length);
+            return result;
         }
     }
 }
