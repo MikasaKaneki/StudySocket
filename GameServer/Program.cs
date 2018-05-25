@@ -1,4 +1,5 @@
-﻿using GameServer.Servers;
+﻿using System;
+using GameServer.Servers;
 
 namespace GameServer
 {
@@ -7,6 +8,7 @@ namespace GameServer
         public static void Main(string[] args)
         {
             Server servers = new Server("127.0.0.1", 8090);
+            Console.ReadKey();
         }
     }
 }
