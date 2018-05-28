@@ -41,18 +41,17 @@ namespace GameServer.Servers
 
         private void ReceiveCallback(IAsyncResult ar)
         {
-            int count = _clientSocket.EndReceive(ar);
-            if (count == 0)
-            {
-                Close();
-            }
-
-            string data = msg.ReadMessage(count, OnProcessMessage);
-            Console.WriteLine("ReceiveCallback data is:" + data);
-            Start();
             try
             {
+                int count = _clientSocket.EndReceive(ar);
+                if (count == 0)
+                {
+                    Close();
+                }
 
+                string data = msg.ReadMessage(count, OnProcessMessage);
+                Console.WriteLine("ReceiveCallback data is:" + data);
+                Start();
             }
             catch (Exception e)
             {
