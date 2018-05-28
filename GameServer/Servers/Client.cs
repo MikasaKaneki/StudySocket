@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Sockets;
+using GameServer.Tool;
+using MySql.Data.MySqlClient;
 using Share;
 
 namespace GameServer.Servers
@@ -9,6 +12,13 @@ namespace GameServer.Servers
         private Socket _clientSocket;
         private Server _server;
         private Message msg = new Message();
+
+        private MySqlConnection _mySqlConnection;
+
+        public MySqlConnection MySqlConnection
+        {
+            get { return _mySqlConnection; }
+        }
 
         public Client()
         {
@@ -23,26 +33,30 @@ namespace GameServer.Servers
 
         public void Start()
         {
+            _mySqlConnection = ConnHelper.Connect();
+
             _clientSocket.BeginReceive(msg.Data, msg.CurDataSize, msg.RemianSize, SocketFlags.None, ReceiveCallback,
                 null);
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
+            int count = _clientSocket.EndReceive(ar);
+            if (count == 0)
+            {
+                Close();
+            }
+
+            string data = msg.ReadMessage(count, OnProcessMessage);
+            Console.WriteLine("ReceiveCallback data is:" + data);
+            Start();
             try
             {
-                int count = _clientSocket.EndReceive(ar);
-                if (count == 0)
-                {
-                    Close();
-                }
 
-                msg.ReadMessage(count, OnProcessMessage);
-                Start();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("ReceiveCallback is error:" + e.Message);
             }
         }
 
