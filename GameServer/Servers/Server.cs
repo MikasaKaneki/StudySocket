@@ -54,7 +54,7 @@ namespace GameServer.Servers
             Socket clientSocket = serverSocket.EndAccept(ar);
             Client client = new Client(clientSocket, this);
             _clientList.Add(client);
-            client.Start();
+            serverSocket.BeginAccept(AcceptCallback, null);
         }
 
         public void RemoveClient(Client client)

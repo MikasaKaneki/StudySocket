@@ -28,6 +28,7 @@ namespace GameServer.Servers
         {
             this._clientSocket = clientSocket;
             this._server = server;
+            Start();
         }
 
 
@@ -35,12 +36,16 @@ namespace GameServer.Servers
         {
             _mySqlConnection = ConnHelper.Connect();
 
+
             _clientSocket.BeginReceive(msg.Data, msg.CurDataSize, msg.RemianSize, SocketFlags.None, ReceiveCallback,
                 null);
+
+            Console.WriteLine("开始接收客户端的消息");
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
+            Console.WriteLine("接收到了客户端的消息");
             try
             {
                 int count = _clientSocket.EndReceive(ar);
