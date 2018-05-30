@@ -35,17 +35,22 @@ namespace GameServer.Servers
         public void Start()
         {
             _mySqlConnection = ConnHelper.Connect();
-
-
-            _clientSocket.BeginReceive(msg.Data, msg.CurDataSize, msg.RemianSize, SocketFlags.None, ReceiveCallback,
-                null);
-
-            Console.WriteLine("开始接收客户端的消息");
+            if (_clientSocket != null && _clientSocket.Connected)
+            {
+                _clientSocket.BeginReceive(msg.Data, msg.CurDataSize, msg.RemianSize, SocketFlags.None, ReceiveCallback,
+                    null);
+                Console.WriteLine("开始接收客户端的消息");
+            }
+            else
+            {
+                Console.WriteLine("客户端关闭了");
+            }
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
             Console.WriteLine("接收到了客户端的消息");
+
             try
             {
                 int count = _clientSocket.EndReceive(ar);
