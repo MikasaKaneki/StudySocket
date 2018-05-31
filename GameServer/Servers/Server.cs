@@ -13,7 +13,8 @@ namespace GameServer.Servers
         private IPEndPoint _ipEndPoint;
         private Socket serverSocket;
         private List<Client> _clientList = new List<Client>();
-        private ControllerManager controllerManager;
+        private ControllerManager _controllerManager;
+        private List<Room> _roomList = new List<Room>();
 
         public Server()
         {
@@ -21,7 +22,7 @@ namespace GameServer.Servers
 
         public Server(string ipStr, int port)
         {
-            controllerManager = new ControllerManager(this);
+            _controllerManager = new ControllerManager(this);
             SetIpAndPort(ipStr, port);
             Start();
         }
@@ -74,7 +75,7 @@ namespace GameServer.Servers
 
         public void HandleRequest(RequestCode requestCode, ActionCode actionCode, string data, Client client)
         {
-            controllerManager.HandleRequest(requestCode, actionCode, data, client);
+            _controllerManager.HandleRequest(requestCode, actionCode, data, client);
         }
     }
 }
